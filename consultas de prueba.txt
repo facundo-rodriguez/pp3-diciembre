@@ -1,0 +1,137 @@
+
+
+
+use lujanbue_practica_prof;
+
+
+select dc.id_Cursada , pl.Carrera as Carrera, dc.Anio,
+u.User as Usuario, dc.fk_Legajo as legajo,
+concat(p.Nombre,' ',p.Apellido) as nombre_completo,  
+m.Descripcion as materia, e.Descripcion_Estado as estado, 
+ifnull(dc.Primer_Parcial,"-") as Primer_Parcial , 
+ifnull(dc.Recuperatio_Parcial_1,"-") as Recuperatorio_Parcial_1, 
+ifnull(dc.Primer_TP,"-") as Primer_TP, 
+ifnull(dc.Recuperatio_TP_1,"-") as Recuperatorio_TP_1, 
+ifnull(dc.Segundo_Parcial,"-") as Segundo_Parcial, 
+ifnull(dc.Recuperatio_Parcial_2,"-") as Recuperatorio_Parcial_2,
+ifnull(dc.Segundo_TP,"-") as Segundo_TP, 
+ifnull(dc.Recuperatio_TP_2,"-") as Recuperatorio_TP_2, 
+ifnull(dc.Promedio,"-") as Promedio,
+ifnull(dc.Final,"-") as Final
+from DetalleCursada dc
+inner join Materia m on m.Id_Materia=dc.fk_Materia
+inner join Estado e on dc.fk_Estado=e.Id_Estado
+inner join Usuario u on dc.fk_Usuario= u.Id_Usuario
+inner join Persona p on p.DNI=u.fk_DNI
+inner join Plan pl on pl.cod_Plan=u.fk_Plan
+order by dc.Anio asc, u.fk_Plan, dc.fk_Materia
+
+where ;
+
+
+select concat(u.User ,' - ',u.fk_Plan,' - ',p.DNI,' - ',p.Nombre,' ',p.Apellido) as alumnos, u.Id_Usuario as id_usuario 
+from  Usuario u 
+inner join Persona p on p.DNI=u.fk_DNI
+where u.fk_Rol=1;
+
+
+select f.Id_Fecha_Final as id_final, dc.fk_Materia as id_materia, 
+m.Descripcion as materia, f.Fecha as fecha, dc.fk_Legajo as legajo
+from Materia m 
+inner join DetalleCursada dc on dc.fk_Materia=Id_Materia
+inner join FechasFinales f on f.fk_Materia=dc.fk_Materia
+where f.fk_Estado_Final=1
+and dc.Promedio>=4 
+and dc.fk_Usuario=501
+and dc.Final<4
+
+update DetalleCursada set Final=3 where id_Cursada=58
+
+
+inner join ActaVolante a on a.fk_Materia=f.fk_Materia
+where a.Nota<4  and fk_Usuario=501
+
+or a.Nota is null
+
+insert into FechasFinales (fk_Materia, Fecha, fk_Estado_Final)
+select 4, now(), 1
+
+insert into DetalleCursada 
+(fk_Usuario, fk_Legajo,	fk_Materia,	fk_Estado, Primer_Parcial, 
+Recuperatio_Parcial_1, Primer_TP, Recuperatio_TP_1, 
+Segundo_Parcial, Recuperatio_Parcial_2, Segundo_TP, Recuperatio_TP_2,
+Promedio, Final, Anio)
+select 501,897,2,1,10,null,10,null,10,null,10,null,10,3,1
+
+
+insert into ActaVolante 
+    ( fk_id_Fecha_final, fk_Fecha_Final,fk_Materia, fk_Usuario, fk_Legajo)
+    values(?,?,?,?,?)
+
+
+#ALTER TABLE FechasFinales DROP PRIMARY KEY
+
+ALTER TABLE Usuario CHANGE `Id_Usuario` `Id_Usuario` INT(11) NOT NULL;
+ALTER TABLE Usuario DROP PRIMARY KEY;
+ALTER TABLE Usuario CHANGE `Id_Usuario` `Id_Usuario` INT(11) NOT NULL AUTO_INCREMENT, add PRIMARY KEY (`Id_Fecha_Final`);
+
+alter TABLE DetalleCursada add constraint `fk_detallecursada_id_usuario` FOREIGN  KEY  (fk_Usuario) references Usuario (Id_Usuario)
+
+--alter TABLE DetalleCursada add constraint `fk_detallecursada_legajo` FOREIGN  KEY  (fk_Legajo) references Usuario(Legajo)
+
+
+show create table ActaVolante
+
+ALTER TABLE ActaVolante DROP KEY `fk_id_usuario`;
+
+select * from ActaVolante
+
+ALTER TABLE ActaVolante DROP FOREIGN KEY fk_Id_Materia_Acta_Volante;
+
+ALTER TABLE ActaVolante DROP FOREIGN KEY fk_Fecha;
+ALTER TABLE `ActaVolante` DROP INDEX `fk_Fecha`;
+
+ALTER TABLE FechasFinales CHANGE `Id_Fecha_Final` `Id_Fecha_Final` INT(11) NOT NULL;
+ALTER TABLE FechasFinales CHANGE `Id_Fecha_Final` `Id_Fecha_Final` INT(11) NOT NULL AUTO_INCREMENT, add PRIMARY KEY (`Id_Fecha_Final`);
+
+
+
+delete from ActaVolante
+
+select a.fk_id_Fecha_final as id_final, a.fk_Fecha_Final as fecha, 
+m.Descripcion as materia, a.Folio as folio, a.Nota as Nota
+from ActaVolante a 
+inner join Materia m on m.Id_Materia=a.fk_Materia
+where a.fk_Usuario=501
+order by a.fk_Fecha_Final asc
+
+
+
+select * from Usuario where Id_Usuario=501 fk_Rol=1 and fk_DNI=4;
+
+select * from Rol
+
+select Id_Materia as id_materia, Descripcion as descripcion 
+from Materia where Descripcion!="No Aplica";
+
+select * from Estado
+
+select * from Persona
+
+select * from Plan
+
+select * from DetalleCursada
+
+select * from FechasFinales
+
+select * from ActaVolante
+
+
+
+
+
+
+
+
+
+

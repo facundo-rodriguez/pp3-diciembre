@@ -1,0 +1,218 @@
+
+
+
+
+CREATE TABLE IF NOT EXISTS `Persona` (
+  `DNI` INT NOT NULL,
+  `Nombre` VARCHAR(50) NOT NULL,
+  `Apellido` VARCHAR(50) NOT NULL,
+  `Fechanacimiento` DATE NULL,
+  `Telefono` VARCHAR(25) NOT NULL,
+  `Email` VARCHAR(255) NOT NULL,
+  `Domicilio` VARCHAR(100) NULL,
+  `Inscripto` BIT(1) NOT NULL DEFAULT 1,
+  `Path_Foto_Perfil` VARCHAR(1000) NULL,
+  PRIMARY KEY (`DNI`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Estado`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Estado` (
+  `Id_Estado` INT NOT NULL AUTO_INCREMENT,
+  `Descripcion_Estado` VARCHAR(45) NOT NULL unique,
+  PRIMARY KEY (`Id_Estado`))
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Plan`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Plan` (
+  `cod_Plan` VARCHAR(50) NOT NULL ,
+  `Carrera` VARCHAR(50) NOT NULL ,
+  `Estado_Id_Estado` INT NOT NULL,
+  PRIMARY KEY (`cod_plan`,`Carrera`),
+  
+  CONSTRAINT `fk_Plan_Estado` FOREIGN KEY (`Estado_Id_Estado`) REFERENCES `Estado` (`Id_Estado`)
+
+)ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Rol`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Rol` (
+  `id_Rol` INT NOT NULL AUTO_INCREMENT,
+  `descripcion` VARCHAR(45) NOT NULL unique,
+  PRIMARY KEY (`id_Rol`)
+
+)ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Usuario`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Usuario` (
+  `Id_Usuario` INT NOT NULL AUTO_INCREMENT,
+  `Legajo` VARCHAR(50) NOT NULL ,
+  `User` VARCHAR(50) NOT NULL unique,
+  `Password` VARCHAR(50) NULL,
+  `Libromatriz` VARCHAR(20) NULL unique,
+  `fk_Plan` VARCHAR(50) NOT NULL,
+  `fk_Estado_Usuario` INT NOT NULL,
+  `fk_Rol` INT NOT NULL,
+  `fk_DNI` INT NOT NULL,
+  PRIMARY KEY (`Id_Usuario`),
+
+  CONSTRAINT `fk_plan` FOREIGN KEY (`fk_Plan`) REFERENCES `Plan` (`cod_Plan`),
+  
+  CONSTRAINT `fk_Estado_usuario` FOREIGN KEY (`fk_Estado_Usuario`) REFERENCES `Estado` (`Id_Estado`),
+
+  CONSTRAINT `fk_Usuario_Persona` FOREIGN KEY (`fk_DNI`) REFERENCES `Persona` (`DNI`),
+  
+  CONSTRAINT `fk_Usuario_Rol` FOREIGN KEY (`fk_Rol`) REFERENCES `Rol` (`id_Rol`)
+
+)ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Materia`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Materia` (
+  
+  `id_Materia` INT NOT NULL AUTO_INCREMENT,
+  `Descripcion` VARCHAR(45) NULL,
+  `fk_Estado` INT NULL,
+  `Promocional` BIT NOT NULL DEFAULT 1,
+  `Anio_Carrera` ENUM("1","2","3") NOT NULL,
+  PRIMARY KEY (`id_Materia`),
+  CONSTRAINT `fk_Id_Estado_Materia` FOREIGN KEY (`fk_Estado`) REFERENCES `estado` (`Id_Estado`)
+
+)ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Detalle_Plan`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Detalle_Plan` (
+  `Id_Detalle_Plan` INT NOT NULL AUTO_INCREMENT,
+  `fk_Materia` INT NULL,
+  `fk_Plan` VARCHAR(50) NOT NULL,
+  PRIMARY KEY (`Id_Detalle_Plan`),
+ 
+  CONSTRAINT `fk_Id_Materia` FOREIGN KEY (`fk_Materia`) REFERENCES `materia` (`id_Materia`),
+  
+  CONSTRAINT `fk_Detalle_Plan` FOREIGN KEY (`fk_Plan`) REFERENCES `plan` (`cod_Plan`)
+
+)ENGINE = InnoDB;
+
+
+
+CREATE TABLE IF NOT EXISTS `detallecursada` (
+  `id_Cursada` INT NOT NULL AUTO_INCREMENT,
+  `fk_Usuario` INT  NOT NULL,
+  `fk_Legajo` VARCHAR(50) NOT NULL,
+  `fk_Materia` INT NOT NULL,
+  `fk_Estado` INT NOT NULL,
+  `Primer_Parcial` DECIMAL(4,2) NULL,
+  `Recuperatio_Parcial_1` DECIMAL(4,2) NULL,
+  `Primer_TP` DECIMAL(4,2) NULL,
+  `Recuperatio_TP_1` DECIMAL(4,2) NULL,
+  `Segundo_Parcial` DECIMAL(4,2) NULL,
+  `Recuperatio_Parcial_2` DECIMAL(4,2) NULL,
+  `Segundo_TP` DECIMAL(4,2) NULL,
+  `Recuperatio_TP_2` DECIMAL(4,2) NULL,
+  `Promedio` DECIMAL(4,2) NULL,
+  `Anio` VARCHAR(4) NOT NULL,
+  PRIMARY KEY (`id_Cursada`),
+
+  CONSTRAINT `fk_id` FOREIGN KEY (`fk_Usuario`) REFERENCES `usuario` (`Id_Usuario`),
+   
+  /*CONSTRAINT `fk_detallecursada_usuario_legajo` FOREIGN KEY (`fk_Legajo`) REFERENCES `Usuario` (`Legajo`),
+*/
+  CONSTRAINT `fk_detallecursada_materia` FOREIGN KEY (`fk_Materia`) REFERENCES `materia` (`id_Materia`),
+
+  CONSTRAINT `fk_detallecursada_Estado` FOREIGN KEY (`fk_Estado`) REFERENCES `estado` (`Id_Estado`)
+
+) ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `FechasFinales`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `fechasfinales` (
+  `Id_Fecha_Final` INT NOT NULL AUTO_INCREMENT,
+  `fk_Materia` INT NOT NULL,
+  `Fecha` DATE NOT NULL,
+  `fk_Estado` INT NOT NULL,
+  PRIMARY KEY (`Id_Fecha_Final`),
+
+  CONSTRAINT `fk_Fechas_Finales_Estado` FOREIGN KEY (`fk_Estado`) REFERENCES `estado` (`Id_Estado`),
+  
+  CONSTRAINT `fk_Materia_FechasFinales` FOREIGN KEY (`fk_Materia`) REFERENCES `materia` (`id_Materia`)
+
+) ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `ActaVolante`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `ActaVolante` (
+  `Id_Acta_Volante` INT NOT NULL AUTO_INCREMENT,
+  `fk_Materia` INT NOT NULL,
+  `fk_id_Fecha_Final` INT NOT NULL,
+  `fk_Fecha_Final` DATE NOT NULL,
+  `fk_Usuario` INT NOT NULL,
+  `fk_Legajo` VARCHAR(50) NOT NULL,
+  `Folio` VARCHAR(20)  NULL,
+  `Nota` DECIMAL(4,2) NULL DEFAULT 0,
+  PRIMARY KEY (`Id_Acta_Volante`),
+  
+  CONSTRAINT `fk_Id_Materia_Acta_Volante` FOREIGN KEY (`fk_Materia`) REFERENCES `materia` (`id_Materia`),
+  
+  CONSTRAINT `fk_Fecha` FOREIGN KEY (`fk_id_Fecha_Final`) REFERENCES `fechasfinales` (`Id_Fecha_Final`),
+
+  CONSTRAINT `fk_id_usuario` FOREIGN KEY (`fk_Usuario`) REFERENCES `usuario` (`Id_Usuario`)
+  
+   # CONSTRAINT `fk_legajp` FOREIGN KEY (`fk_Legajo`) REFERENCES `usuario` (`Legajo`)
+  
+ #-- CONSTRAINT `Fk_fechas_Date` FOREIGN KEY (`Fecha_Final`) REFERENCES `FechasFinales` (`Fecha`)
+
+)ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Documentacion`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `Documentacion` (
+  `id_Documentacion` INT NOT NULL AUTO_INCREMENT,
+  `Descripcion` VARCHAR(50) NOT NULL,
+  `Estado_Documentacion` INT NOT NULL,
+  `fk_Materia` INT NOT NULL,
+  `Permisos_visibilidad` INT NOT NULL,
+  `Ubicacion` VARCHAR(100) NOT NULL,
+  PRIMARY KEY (`id_Documentacion`),
+
+  CONSTRAINT `fk_Documentacion_Estado` FOREIGN KEY (`Estado_Documentacion`) REFERENCES `estado` (`Id_Estado`),
+  
+  CONSTRAINT `fk_Documentacion_Materia` FOREIGN KEY (`fk_Materia`) REFERENCES `materia` (`id_Materia`)
+
+)ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Table `Correlativas`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `correlativa` (
+  `id_Correlativa` INT NOT NULL AUTO_INCREMENT,
+  `fk_Materia` INT NOT NULL,
+  `Depende_de` INT NOT NULL,
+  PRIMARY KEY (`id_Correlativa`),
+  
+  CONSTRAINT `fk_Correlativas_Materias1` FOREIGN KEY (`fk_Materia`) REFERENCES `materia` (`id_Materia`),
+  
+  CONSTRAINT `fk_Correlativas_Materias2` FOREIGN KEY (`Depende_de`) REFERENCES `materia` (`id_Materia`)
+
+)ENGINE = InnoDB;
